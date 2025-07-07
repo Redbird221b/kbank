@@ -1,6 +1,7 @@
 package org.spectre.kbank.service
 
 import org.spectre.kbank.domain.Customer
+import org.spectre.kbank.exception.DuplicateCustomerException
 import org.spectre.kbank.repository.CustomerRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -26,7 +27,7 @@ class CustomerService @Autowired constructor(
 
     fun createCustomer(name: String, phoneNumber: String, email: String): Customer {
         if (findCustomerByEmail(email) != null || findCustomerByPhoneNumber(phoneNumber) != null) {
-            throw IllegalArgumentException("Customer with email $email already exists")
+            throw DuplicateCustomerException("Customer with email $email already exists")
         } else {
             val customer = Customer(name = name, phoneNumber = phoneNumber, email = email)
             return repository.save(customer)

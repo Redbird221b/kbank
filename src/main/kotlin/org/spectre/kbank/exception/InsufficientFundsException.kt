@@ -1,4 +1,4 @@
 package org.spectre.kbank.exception
 
-class InsufficientFundsException {
+class InsufficientFundsException(message: String) : RuntimeException(message) {
 }

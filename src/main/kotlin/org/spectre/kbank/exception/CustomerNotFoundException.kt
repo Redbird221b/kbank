@@ -1,4 +1,4 @@
 package org.spectre.kbank.exception
 
-class CustomerNotFoundException {
+class CustomerNotFoundException(message: String) : RuntimeException(message) {
 }
