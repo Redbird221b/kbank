@@ -11,6 +11,8 @@ class CustomerService @Autowired constructor(
     private val repository: CustomerRepository
 ) {
 
+    fun getAllCustomers(): List<Customer> = repository.findAll()
+
     fun findCustomerByEmail(email: String): Customer? {
         val customers = repository.findAll()
         return customers.firstOrNull { it.email == email }

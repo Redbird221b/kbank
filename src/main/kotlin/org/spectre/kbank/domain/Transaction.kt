@@ -22,6 +22,4 @@ class Transaction(
     val transactionDate: LocalDateTime,
     @ManyToOne
     val account: BankAccount
-) {
-
-}
+)

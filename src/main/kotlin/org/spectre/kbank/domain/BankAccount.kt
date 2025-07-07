@@ -1,36 +1,38 @@
 package org.spectre.kbank.domain
 
 import jakarta.persistence.Column
-import jakarta.persistence.DiscriminatorColumn
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Inheritance
-import jakarta.persistence.InheritanceType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import org.spectre.kbank.enums.AccountTypes
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "account_type")
-abstract class BankAccount(
+data class BankAccount(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    open val id: Long? = null,
+    val id: Long? = null,
 
     @Column(nullable = false, unique = true)
-    val accountNumber: String = "",
+    val accountNumber: String,
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    val accountHolder: Customer? = null,
+    @JoinColumn(name = "customer_id", nullable = false)
+    val accountHolder: Customer,
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "account_balance", nullable = false)
     var accountBalance: BigDecimal = BigDecimal.ZERO,
 
-    @Column(nullable = false, unique = true)
-    val accountCreationDate: LocalDateTime = LocalDateTime.now()
+    @Column(name = "account_creation_date", nullable = false)
+    val accountCreationDate: LocalDateTime = LocalDateTime.now(),
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_type", nullable = false)
+    val accountType: AccountTypes
 )

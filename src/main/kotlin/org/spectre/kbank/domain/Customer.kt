@@ -17,6 +17,4 @@ data class Customer (
     val email: String,
     @OneToMany(mappedBy = "accountHolder", cascade = [CascadeType.ALL], orphanRemoval = true)
     val accounts: MutableList<BankAccount> = mutableListOf()
-) {
-
-}
+)

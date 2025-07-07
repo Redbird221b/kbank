@@ -42,7 +42,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidAccountTypeException::class)
     fun handleInvalidAccountType(
-        ex: AccountNotFoundException,
+        ex: InvalidAccountTypeException,
         request: HttpServletRequest
     ): ResponseEntity<ApiErrorResponse> {
         val error = ApiErrorResponse(
@@ -52,7 +52,7 @@ class GlobalExceptionHandler {
             message = ex.message ?: "Invalid account type",
             path = request.requestURI
         )
-        return ResponseEntity(error, HttpStatus.NOT_FOUND)
+        return ResponseEntity(error, HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(InsufficientFundsException::class)

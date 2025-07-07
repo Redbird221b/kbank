@@ -1,4 +1,3 @@
 package org.spectre.kbank.exception
 
-class InvalidTransactionAmountException(message: String) : RuntimeException(message) {
-}
+class InvalidTransactionAmountException(message: String) : RuntimeException(message)
