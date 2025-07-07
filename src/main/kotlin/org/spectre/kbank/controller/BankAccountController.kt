@@ -55,7 +55,7 @@ class BankAccountController @Autowired constructor(
         val dto = BankAccountResponseDto(
             id = account.id,
             accountNumber = account.accountNumber,
-            accountHolderName = account.accountHolder?.name ?: "Unknown",
+            accountHolderName = account.accountHolder.name,
             balance = account.accountBalance,
             createdAt = account.accountCreationDate,
             accountType = account.javaClass.simpleName.lowercase()
