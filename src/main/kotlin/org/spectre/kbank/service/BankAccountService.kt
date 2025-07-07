@@ -4,9 +4,15 @@ import jakarta.transaction.Transactional
 import org.spectre.kbank.domain.BankAccount
 import org.spectre.kbank.domain.Customer
 import org.spectre.kbank.domain.Transaction
+import org.spectre.kbank.dto.request.CreateAccountRequestDto
+import org.spectre.kbank.dto.request.TransactionRequestDto
+import org.spectre.kbank.dto.response.AccountBalanceResponseDto
+import org.spectre.kbank.dto.response.BankAccountResponseDto
+import org.spectre.kbank.dto.response.TransactionResponseDto
 import org.spectre.kbank.enums.AccountTypes
 import org.spectre.kbank.enums.TransactionTypes
 import org.spectre.kbank.exception.AccountNotFoundException
+import org.spectre.kbank.exception.CustomerNotFoundException
 import org.spectre.kbank.exception.DuplicateCustomerException
 import org.spectre.kbank.exception.InsufficientFundsException
 import org.spectre.kbank.exception.InvalidAccountTypeException
@@ -16,11 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 class BankAccountService @Autowired constructor(
     private val repository: BankAccountRepository,
     private val transactionService: TransactionService,
+    private val customerService: CustomerService
 ) {
 
     fun findBankAccountById(id: Long): BankAccount? {
@@ -32,6 +40,22 @@ class BankAccountService @Autowired constructor(
         return bankAccounts.firstOrNull { it.accountHolder.id == customerId }
     }
 
+    fun createAccount(request: CreateAccountRequestDto): BankAccount {
+        val customer = customerService.getCustomerById(request.customerId)
+            ?: throw CustomerNotFoundException("Customer with id ${request.customerId} not found")
+
+        val accountNumber = generateAccountNumber()
+        val now = LocalDateTime.now()
+
+        return createBankAccount(
+            accountNumber = accountNumber,
+            accountHolder = customer,
+            accountBalance = request.initialBalance,
+            accountCreationDate = now,
+            accountType = request.accountType
+        )
+    }
+
     fun createBankAccount(
         accountNumber: String,
         accountHolder: Customer,
@@ -40,9 +64,9 @@ class BankAccountService @Autowired constructor(
         accountType: String
     ): BankAccount {
         val type = try {
-            AccountTypes.valueOf(accountType)
-        } catch (ex: InvalidAccountTypeException) {
-            throw InvalidAccountTypeException("Invalid account type: $accountType. ")
+            AccountTypes.valueOf(accountType.uppercase())
+        } catch (ex: IllegalArgumentException) {
+            throw InvalidAccountTypeException("Invalid account type: $accountType.")
         }
 
         if (findBankAccountByCustomerId(accountHolder.id!!) != null) {
@@ -51,16 +75,63 @@ class BankAccountService @Autowired constructor(
 
         val newAccount = BankAccount(
             accountNumber = accountNumber,
-            accountBalance = accountBalance,
             accountHolder = accountHolder,
+            accountBalance = accountBalance,
             accountCreationDate = accountCreationDate,
             accountType = type
         )
         return repository.save(newAccount)
     }
 
+    private fun generateAccountNumber(): String {
+        return "ACC" + UUID.randomUUID().toString().take(10).uppercase()
+    }
+
+    fun getAccountDtoById(id: Long): BankAccountResponseDto {
+        val account = findBankAccountById(id)
+            ?: throw AccountNotFoundException("Account with id $id not found")
+
+        return BankAccountResponseDto(
+            id = account.id,
+            accountNumber = account.accountNumber,
+            accountHolderName = account.accountHolder.name,
+            balance = account.accountBalance,
+            createdAt = account.accountCreationDate,
+            accountType = account.accountType.name.lowercase()
+        )
+    }
 
     @Transactional
+    fun deposit(id: Long, request: TransactionRequestDto) {
+        makeDeposit(id, request.amount)
+    }
+
+    @Transactional
+    fun withdraw(id: Long, request: TransactionRequestDto) {
+        makeWithdrawal(id, request.amount)
+    }
+
+    fun getBalanceDto(id: Long): AccountBalanceResponseDto {
+        return AccountBalanceResponseDto(
+            accountId = id,
+            balance = getAccountBalance(id)
+        )
+    }
+
+    fun getTransactionsDto(accountId: Long): List<TransactionResponseDto> {
+        return transactionService.getTransactionsForAccount(accountId).map {
+            TransactionResponseDto(
+                id = it.id,
+                accountId = it.account.id,
+                amount = it.amount,
+                transactionDate = it.transactionDate,
+                transactionType = it.transactionType.name.lowercase()
+            )
+        }
+    }
+
+
+
     fun makeDeposit(id: Long, amount: BigDecimal) {
         val account = findBankAccountById(id) ?: throw AccountNotFoundException("Account not found")
         if (amount <= BigDecimal.ZERO) throw InvalidTransactionAmountException("Amount must be greater than 0")
@@ -78,7 +149,6 @@ class BankAccountService @Autowired constructor(
     }
 
 
-    @Transactional
     fun makeWithdrawal(id: Long, amount: BigDecimal) {
         val account = findBankAccountById(id) ?: throw AccountNotFoundException("Account not found")
         if (amount <= BigDecimal.ZERO) throw InvalidTransactionAmountException("Amount must be greater than 0")
