@@ -29,7 +29,7 @@ abstract class BankAccount(
     val accountHolder: Customer? = null,
 
     @Column(nullable = false, unique = true)
-    val accountBalance: BigDecimal = BigDecimal.ZERO,
+    var accountBalance: BigDecimal = BigDecimal.ZERO,
 
     @Column(nullable = false, unique = true)
     val accountCreationDate: LocalDateTime = LocalDateTime.now()

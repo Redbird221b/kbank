@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionRepository: JpaRepository<Transaction, Long> {
-    fun findByAccountHolderId(accountHolderId: Long): List<BankAccount>
+    fun findByAccountId(accountId: Long): List<Transaction>
 }
