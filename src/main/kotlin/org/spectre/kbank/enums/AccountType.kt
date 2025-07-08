@@ -1,5 +1,5 @@
 package org.spectre.kbank.enums
 
-enum class AccountTypes {
+enum class AccountType {
     SAVINGS, CURRENT
 }

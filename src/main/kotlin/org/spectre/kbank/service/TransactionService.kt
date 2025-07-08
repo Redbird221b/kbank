@@ -15,5 +15,5 @@ class TransactionService @Autowired constructor(
     )
 
     @Transactional
-    fun createTransaction(transaction: Transaction) = repository.save(transaction)
+    fun createTransaction(transaction: Transaction): Transaction = repository.save(transaction)
 }

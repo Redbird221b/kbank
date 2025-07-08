@@ -1,5 +1,5 @@
 package org.spectre.kbank.enums
 
-enum class TransactionTypes {
+enum class TransactionType {
     DEPOSIT, WITHDRAWAL
 }

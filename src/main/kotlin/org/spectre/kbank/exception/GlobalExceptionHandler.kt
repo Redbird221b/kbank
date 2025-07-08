@@ -99,4 +99,19 @@ class GlobalExceptionHandler {
         )
         return ResponseEntity(error,HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(SameAccountTransferException::class)
+    fun handleSameAccountTransfer(
+        ex: SameAccountTransferException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiErrorResponse> {
+        val error = ApiErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status = HttpStatus.BAD_REQUEST.value(),
+            error = "Transfer error",
+            message = ex.message ?: "Cannot transfer to the same account",
+            path = request.requestURI
+        )
+        return ResponseEntity(error,HttpStatus.BAD_REQUEST)
+    }
 }

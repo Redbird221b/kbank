@@ -9,8 +9,8 @@ import org.spectre.kbank.dto.request.TransactionRequestDto
 import org.spectre.kbank.dto.response.AccountBalanceResponseDto
 import org.spectre.kbank.dto.response.BankAccountResponseDto
 import org.spectre.kbank.dto.response.TransactionResponseDto
-import org.spectre.kbank.enums.AccountTypes
-import org.spectre.kbank.enums.TransactionTypes
+import org.spectre.kbank.enums.AccountType
+import org.spectre.kbank.enums.TransactionType
 import org.spectre.kbank.exception.AccountNotFoundException
 import org.spectre.kbank.exception.CustomerNotFoundException
 import org.spectre.kbank.exception.DuplicateCustomerException
@@ -64,7 +64,7 @@ class BankAccountService @Autowired constructor(
         accountType: String
     ): BankAccount {
         val type = try {
-            AccountTypes.valueOf(accountType.uppercase())
+            AccountType.valueOf(accountType.uppercase())
         } catch (ex: IllegalArgumentException) {
             throw InvalidAccountTypeException("Invalid account type: $accountType.")
         }
@@ -131,7 +131,6 @@ class BankAccountService @Autowired constructor(
     }
 
 
-
     fun makeDeposit(id: Long, amount: BigDecimal) {
         val account = findBankAccountById(id) ?: throw AccountNotFoundException("Account not found")
         if (amount <= BigDecimal.ZERO) throw InvalidTransactionAmountException("Amount must be greater than 0")
@@ -143,7 +142,7 @@ class BankAccountService @Autowired constructor(
                 amount = amount,
                 transactionDate = LocalDateTime.now(),
                 account = account,
-                transactionType = TransactionTypes.DEPOSIT
+                transactionType = TransactionType.DEPOSIT
             )
         )
     }
@@ -160,7 +159,7 @@ class BankAccountService @Autowired constructor(
                 amount = amount,
                 transactionDate = LocalDateTime.now(),
                 account = account,
-                transactionType = TransactionTypes.WITHDRAWAL
+                transactionType = TransactionType.WITHDRAWAL
             )
         )
     }

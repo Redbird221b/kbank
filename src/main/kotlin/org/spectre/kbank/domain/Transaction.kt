@@ -7,7 +7,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
-import org.spectre.kbank.enums.TransactionTypes
+import org.spectre.kbank.enums.TransactionType
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -17,7 +17,7 @@ class Transaction(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Enumerated(EnumType.STRING)
-    val transactionType: TransactionTypes,
+    val transactionType: TransactionType,
     val amount: BigDecimal,
     val transactionDate: LocalDateTime,
     @ManyToOne

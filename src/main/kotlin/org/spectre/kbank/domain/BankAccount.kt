@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import org.spectre.kbank.enums.AccountTypes
+import org.spectre.kbank.enums.AccountType
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -34,5 +34,5 @@ data class BankAccount(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
-    val accountType: AccountTypes
+    val accountType: AccountType
 )
